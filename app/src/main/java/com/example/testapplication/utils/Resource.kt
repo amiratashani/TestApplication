@@ -1,4 +1,4 @@
-package com.example.testapplication.Utils
+package com.example.testapplication.utils
 
 data class Resource<out T>(val status: Status, val data: T?, val message: String?) {
 

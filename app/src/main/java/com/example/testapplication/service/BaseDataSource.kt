@@ -1,6 +1,6 @@
 package com.example.testapplication.service
 
-import com.example.testapplication.Utils.Resource
+import com.example.testapplication.utils.Resource
 import retrofit2.Response
 import timber.log.Timber
 
