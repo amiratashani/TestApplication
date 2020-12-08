@@ -1,4 +1,4 @@
-package com.example.testapplication.ui
+package com.example.testapplication.ui.searchrepos
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

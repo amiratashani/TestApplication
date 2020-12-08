@@ -32,7 +32,7 @@ class RepoAdapter() : ListAdapter<RepoEntity, RepoAdapter.RepoViewHolder>(REPO_D
         holder.bind(getItem(position))
     }
 
-    class RepoViewHolder(private val itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class RepoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(repo: RepoEntity) {
             itemView.repo_name.text = repo.fullName
             itemView.repo_description.text = repo.description
@@ -56,6 +56,4 @@ class RepoAdapter() : ListAdapter<RepoEntity, RepoAdapter.RepoViewHolder>(REPO_D
             }
         }
     }
-
-
 }
