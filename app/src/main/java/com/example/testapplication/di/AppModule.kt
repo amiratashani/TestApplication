@@ -1,11 +1,14 @@
 package com.example.testapplication.di
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.example.testapplication.db.RepoDAO
 import com.example.testapplication.db.RepoDatabase
 import com.example.testapplication.other.Constants.BASE_URL
 import com.example.testapplication.other.Constants.REPOSITORIES_DATABASE_NAME
+import com.example.testapplication.other.Constants.SHARED_PREFERENCES_NAME
 import com.example.testapplication.service.RepoService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -56,5 +59,9 @@ object AppModule {
     fun provideRepoService(retrofit: Retrofit): RepoService =
         retrofit.create(RepoService::class.java)
 
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext app: Context):SharedPreferences =
+        app.getSharedPreferences(SHARED_PREFERENCES_NAME, MODE_PRIVATE)
 
 }

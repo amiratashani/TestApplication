@@ -11,8 +11,13 @@ import com.example.testapplication.db.entities.RepoEntity
 interface RepoDAO {
 
     @Query("SELECT * FROM repoentity")
-    fun getAllRepos(): LiveData<List<RepoEntity>>
+    suspend fun getAllRepos(): LiveData<List<RepoEntity>>
+
+    @Query("DELETE FROM repoentity")
+    suspend fun clearRepos()
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(repos: List<RepoEntity>)
+
+
 }

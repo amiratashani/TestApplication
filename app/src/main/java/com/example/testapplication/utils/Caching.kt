@@ -6,13 +6,14 @@ import androidx.lifecycle.map
 import kotlinx.coroutines.Dispatchers
 
 fun <T, A> getDataAndCaching(
-    databaseQuery: LiveData<T>,
+    databaseQuery: suspend () -> LiveData<T>,
     networkCall: suspend () -> Resource<A>,
     saveCallResult: suspend (A) -> Unit
 ): LiveData<Resource<T>> =
     liveData(Dispatchers.IO) {
+
         emit(Resource.loading())
-        val source = databaseQuery.map { Resource.success(it) }
+        val source = databaseQuery.invoke().map { Resource.success(it) }
         emitSource(source)
 
         val responseStatus = networkCall.invoke()
@@ -23,4 +24,5 @@ fun <T, A> getDataAndCaching(
             emit(Resource.error(responseStatus.message!!))
             emitSource(source)
         }
+
     }

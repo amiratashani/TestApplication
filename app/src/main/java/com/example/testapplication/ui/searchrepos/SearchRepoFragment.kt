@@ -1,10 +1,12 @@
 package com.example.testapplication.ui.searchrepos
 
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.testapplication.R
@@ -22,6 +24,7 @@ class SearchRepoFragment : Fragment() {
 
     private lateinit var adapter: RepoAdapter
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -36,9 +39,15 @@ class SearchRepoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        initUi()
         setupRecycleView()
         setupObservers()
+        setupEditText(viewModel.readQueryFromSharePref()!!)
         viewModel.search("Android")
+    }
+
+    private fun initUi() {
+
     }
 
     private fun setupRecycleView() {
@@ -65,6 +74,32 @@ class SearchRepoFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun setupEditText(query: String) {
+        search_repo.setText(query)
+
+        search_repo.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                search(query)
+                true
+            } else {
+                false
+            }
+        }
+
+        search_repo.setOnKeyListener { _, keyCode, event ->
+            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                search(query)
+                true
+            } else {
+                false
+            }
+        }
+    }
+
+    private fun search(query: String) {
+        viewModel.search(query)
     }
 
     companion object {
