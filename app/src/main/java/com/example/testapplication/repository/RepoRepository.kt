@@ -10,12 +10,10 @@ class RepoRepository @Inject constructor(
     private val repoDAO: RepoDAO
 ) {
     fun getRepos(query: String) = getDataAndCaching(
-        databaseQuery = {repoDAO.getAllRepos()},
+        databaseQuery = { repoDAO.getAllRepos() },
         networkCall = { repoDataSource.getRepos(query) },
-        saveCallResult = { repoSearchResponse -> repoDAO.insertAll(repoSearchResponse.items) }
+        saveCallResult = { repoSearchResponse -> repoDAO.insertAll(repoSearchResponse.items) },
+        clearDatabase = { repoDAO.clearRepos() }
     )
 
-    suspend fun clearRepos(){
-        repoDAO.clearRepos()
-    }
 }

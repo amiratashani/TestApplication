@@ -8,7 +8,8 @@ import kotlinx.coroutines.Dispatchers
 fun <T, A> getDataAndCaching(
     databaseQuery: suspend () -> LiveData<T>,
     networkCall: suspend () -> Resource<A>,
-    saveCallResult: suspend (A) -> Unit
+    saveCallResult: suspend (A) -> Unit,
+    clearDatabase: suspend () -> Unit
 ): LiveData<Resource<T>> =
     liveData(Dispatchers.IO) {
 
@@ -18,6 +19,7 @@ fun <T, A> getDataAndCaching(
 
         val responseStatus = networkCall.invoke()
         if (responseStatus.status == Resource.Status.SUCCESS) {
+            clearDatabase.invoke()
             saveCallResult(responseStatus.data!!)
 
         } else if (responseStatus.status == Resource.Status.ERROR) {

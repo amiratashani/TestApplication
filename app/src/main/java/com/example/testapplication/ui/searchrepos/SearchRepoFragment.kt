@@ -1,13 +1,13 @@
 package com.example.testapplication.ui.searchrepos
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.testapplication.R
 import com.example.testapplication.adapter.RepoAdapter
@@ -18,36 +18,32 @@ import timber.log.Timber
 
 
 @AndroidEntryPoint
-class SearchRepoFragment : Fragment() {
+class SearchRepoFragment : Fragment(R.layout.fragment_search_repo) {
 
     private val viewModel: SearchRepoViewModel by viewModels()
 
     private lateinit var adapter: RepoAdapter
+    private lateinit var query: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        query = viewModel.readQueryFromSharePref()
+        Toast.makeText(requireContext(), "ViewModelsCreate", Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_repo, container, false)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUi()
         setupRecycleView()
         setupObservers()
-        setupEditText(viewModel.readQueryFromSharePref()!!)
-        viewModel.search("Android")
+        setupEditText()
+        search()
     }
 
     private fun initUi() {
-
+        search_repo.setText(query)
     }
 
     private fun setupRecycleView() {
@@ -61,36 +57,42 @@ class SearchRepoFragment : Fragment() {
                 Resource.Status.SUCCESS -> {
                     Timber.e("SUCCESS")
                     Timber.e("${result.data}")
-                    progress_bar.visibility = View.GONE
-                    if (!result.data.isNullOrEmpty()) adapter.submitList(result.data)
+
+                    if (result.data!!.isEmpty())
+                        emptyList.visibility = View.VISIBLE
+                    else {
+                        emptyList.visibility = View.INVISIBLE
+                    }
+
+                    progress_bar.visibility = View.INVISIBLE
+                    list.visibility = View.VISIBLE
+                    adapter.submitList(result.data)
                 }
                 Resource.Status.ERROR -> {
                     Timber.e("ERROR")
-                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        resources.getString(R.string.bad_network),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 Resource.Status.LOADING -> {
                     Timber.e("LOADING")
                     progress_bar.visibility = View.VISIBLE
+                    list.visibility = View.INVISIBLE
                 }
             }
         }
     }
 
-    private fun setupEditText(query: String) {
-        search_repo.setText(query)
-
-        search_repo.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                search(query)
-                true
-            } else {
-                false
-            }
-        }
-
+    private fun setupEditText() {
         search_repo.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                search(query)
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                if (query.trim() != search_repo.text.toString().trim()) {
+                    query = search_repo.text.toString()
+                    search()
+                }
+                hideKeyboardFrom(requireContext(), root)
                 true
             } else {
                 false
@@ -98,12 +100,16 @@ class SearchRepoFragment : Fragment() {
         }
     }
 
-    private fun search(query: String) {
-        viewModel.search(query)
+    private fun search() {
+        if (query.trim().isNotEmpty()) {
+            viewModel.search(query)
+        }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = SearchRepoFragment().apply {}
+    private fun hideKeyboardFrom(context: Context, view: View) {
+        val imm: InputMethodManager =
+            context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
 }

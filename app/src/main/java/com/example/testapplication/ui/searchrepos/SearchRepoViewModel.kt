@@ -7,7 +7,9 @@ import com.example.testapplication.db.entities.RepoEntity
 import com.example.testapplication.other.Constants.KEY_QUERY
 import com.example.testapplication.repository.RepoRepository
 import com.example.testapplication.utils.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SearchRepoViewModel @ViewModelInject constructor(
     private val repository: RepoRepository,
@@ -21,24 +23,18 @@ class SearchRepoViewModel @ViewModelInject constructor(
         get() = _repos
 
     fun search(query: String) {
-        clear()
         _query.value = query
         writeQueryToSharedPref(query)
     }
 
-    fun clear() {
-        viewModelScope.launch {
-            repository.clearRepos()
-        }
-    }
 
-    fun writeQueryToSharedPref(query: String) =
+    private fun writeQueryToSharedPref(query: String) =
         sharedPref.edit()
             .putString(KEY_QUERY, query)
             .apply()
 
 
     fun readQueryFromSharePref() =
-        sharedPref.getString(KEY_QUERY, "")
+        sharedPref.getString(KEY_QUERY, "")!!
 
 }
