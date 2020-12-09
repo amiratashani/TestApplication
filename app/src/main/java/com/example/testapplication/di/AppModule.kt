@@ -30,8 +30,7 @@ object AppModule {
             app,
             RepoDatabase::class.java,
             REPOSITORIES_DATABASE_NAME
-        )
-            .build()
+        ).build()
 
     @Provides
     @Singleton
@@ -54,7 +53,7 @@ object AppModule {
             .build()
 
     @Provides
-    fun provideREpoService(retrofit: Retrofit): RepoService =
+    fun provideRepoService(retrofit: Retrofit): RepoService =
         retrofit.create(RepoService::class.java)
 
 

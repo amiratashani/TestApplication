@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.testapplication.R
 import com.example.testapplication.adapter.RepoAdapter
@@ -55,6 +56,8 @@ class SearchRepoFragment : Fragment() {
                     if (!result.data.isNullOrEmpty()) adapter.submitList(result.data)
                 }
                 Resource.Status.ERROR -> {
+                    Timber.e("ERROR")
+                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
                 }
                 Resource.Status.LOADING -> {
                     Timber.e("LOADING")
